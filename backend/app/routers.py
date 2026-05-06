@@ -11,9 +11,9 @@ def create_card(card: schemas.CardCreate, db: Session = Depends(get_db)):
     return cruds.create_card(db, card)
 
 # 更新
-@router.put("/cards/{card_id}", response_model=schemas.Card)
-def update_card(id: int, card: schemas.CardCreate, db: Session = Depends(get_db)):
-    return cruds.update_card(db, id, card)
+@router.put("/cards/{card_id}", response_model=schemas.CardResponse)
+def update_card(id: int, new_card: schemas.CardCreate, db: Session = Depends(get_db)):
+    return cruds.update_card(db, id, new_card)
 
 # 削除
 @router.delete("/cards/{card_id}")

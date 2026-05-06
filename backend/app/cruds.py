@@ -4,7 +4,7 @@ from app import models, schemas
 
 # 作成
 def create_card(db: Session, card: schemas.CardCreate):
-    db_card = models.Words(
+    db_card = models.Cards(
         word = card.word,
         meaning = card.meaning
     )
@@ -14,6 +14,18 @@ def create_card(db: Session, card: schemas.CardCreate):
     db.refresh(db_card)
 
     return db_card
+
+# 更新
+def update_card(db: Session, id: int, new_card: schemas.CardCreate):
+    card = db.query(models.Cards).filter(models.Cards.id == id).first()
+
+    card.word = new_card.word
+    card.meaning = new_card.meaning
+
+    db.commit()
+    db.refresh(card)
+
+    return card
 
 # 削除
 def delete_card(db: Session, id: int):
