@@ -12,13 +12,13 @@ def create_card(card: schemas.CardCreate, db: Session = Depends(get_db)):
 
 # 更新
 @router.put("/cards/{card_id}", response_model=schemas.CardResponse)
-def update_card(id: int, new_card: schemas.CardCreate, db: Session = Depends(get_db)):
-    return cruds.update_card(db, id, new_card)
+def update_card(card_id: int, new_card: schemas.CardCreate, db: Session = Depends(get_db)):
+    return cruds.update_card(db, card_id, new_card)
 
 # 削除
 @router.delete("/cards/{card_id}")
-def delete_card(id: int, db: Session = Depends(get_db)):
-    cruds.delete_card(db, id)
+def delete_card(card_id: int, db: Session = Depends(get_db)):
+    cruds.delete_card(db, card_id)
 
 # 一覧取得
 @router.get("/cards", response_model=list[schemas.CardResponse])
@@ -27,5 +27,5 @@ def get_cards(db: Session = Depends(get_db)):
 
 # 1件取得
 @router.get("/cards/{card_id}", response_model=schemas.CardResponse)
-def get_card(id: int, db: Session = Depends(get_db)):
-    return cruds.get_card(db, id)
+def get_card(card_id: int, db: Session = Depends(get_db)):
+    return cruds.get_card(db, card_id)
