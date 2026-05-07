@@ -2,15 +2,12 @@ from pydantic import BaseModel
 
 class CardCreate(BaseModel):
     word: str
-    meaning: set
+    meaning: str
 
 class CardResponse(BaseModel):
     id: int
     word: str
-    maening: str
+    meaning: str
 
     class Config:
        from_attributes = True  # SQLAlchemy対応
-
-class CardList(BaseModel):
-    words: list[CardResponse]

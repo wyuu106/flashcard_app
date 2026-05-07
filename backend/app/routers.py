@@ -21,7 +21,7 @@ def delete_card(id: int, db: Session = Depends(get_db)):
     cruds.delete_card(db, id)
 
 # 一覧取得
-@router.get("/cards", response_model=list[schemas.CardList])
+@router.get("/cards", response_model=list[schemas.CardResponse])
 def get_cards(db: Session = Depends(get_db)):
     return cruds.get_cards(db)
 
