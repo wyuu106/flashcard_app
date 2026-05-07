@@ -5,7 +5,7 @@ function App() {
   const [word, setWord] = useState("")
   const [meaning, setMeaning] = useState("")
   const [editingId, setEditingId] = useState(null)
-  const [showMeaning, setShowMeaning] = useState(false)
+  const [openId, setOpenId] = useState(null)
 
   useEffect(() => {
     fetchCards()
@@ -103,7 +103,7 @@ function App() {
       {cards.map((card) => (
         <div key={card.id} className="card">
           <h2>{card.word}</h2>
-          {showMeaning && <p>{card.meaning}</p>}
+          {openId === card.id && <p>{card.meaning}</p>}
 
           <button onClick={() => deleteCard(card.id)}>
             Delete
@@ -113,10 +113,14 @@ function App() {
             Edit
          </button>
 
-         <button onClick={() => setShowMeaning(!showMeaning)}>
-            {showMeaning ? "Hide" : "Show"}
+         <button
+            onClick={() =>
+              setOpenId(openId === card.id ? null : card.id)
+            }
+         >
+            {openId === card.id ? "Hide" : "Show"}
          </button>
-         
+
         </div>
       ))}
     </div>
