@@ -1,12 +1,28 @@
 from sqlalchemy.orm import Session
 from fastapi import Response, HTTPException, status
 from app import models, schemas
+from app.auth import hash_password
 
-# 作成
-def create_card(db: Session, card: schemas.CardCreate):
+# ユーザー登録
+def create_user(db: Session, user: schemas.UserCreate):
+    db_user = models.User(
+        name = user.name,
+        email = user.email,
+        hashed_password = hash_password(user.password)
+    )
+
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+
+    return db_user
+
+# カード作成
+def create_card(db: Session, card: schemas.CardCreate, user_id: str):
     db_card = models.Card(
         word = card.word,
-        meaning = card.meaning
+        meaning = card.meaning,
+        user_id = user_id
     )
 
     db.add(db_card)
@@ -15,7 +31,7 @@ def create_card(db: Session, card: schemas.CardCreate):
 
     return db_card
 
-# 更新
+# カード更新
 def update_card(db: Session, id: int, new_card: schemas.CardCreate):
     card = db.query(models.Card).filter(models.Card.id == id).first()
 
@@ -27,7 +43,7 @@ def update_card(db: Session, id: int, new_card: schemas.CardCreate):
 
     return card
 
-# 削除
+# カード削除
 def delete_card(db: Session, id: int):
     db_card = db.query(models.Card).filter(models.Card.id == id).one_or_none()
 
@@ -39,11 +55,13 @@ def delete_card(db: Session, id: int):
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-# 一覧取得
-def get_cards(db: Session):
-    return db.query(models.Card).all()
+# カード一覧取得
+def get_cards(db: Session, user_id: str):
+    return db.query(models.Card).filter(
+        models.Card.user_id == user_id
+        ).all()
 
-# １件取得
+# カード１件取得
 def get_card(db: Session, id: int):
     card = db.query(models.Card).filter(models.Card.id == id).one_or_none()
 
