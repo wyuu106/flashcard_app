@@ -1,0 +1,29 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordRequestForm
+from app.db import get_db
+from app.schemas import user_schema
+from app.cruds import user_crud
+
+router = APIRouter()
+
+# ユーザー登録
+@router.post('/users', response_model=user_schema.UserResponse)
+def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
+    return user_crud.create_user(db, user)
+
+# ユーザー一覧
+@router.get('/users', response_model=list[user_schema.UserResponse])
+def get_users(db: Session = Depends(get_db)):
+    return user_crud.get_users(db)
+
+# ユーザー削除
+@router.delete('/users/{id}')
+def delete_user(id: str, db: Session = Depends(get_db)):
+    return user_crud.delete_user(db, id)
+
+
+# ログイン
+@router.post('/login')
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    return user_crud.login(db, form_data)

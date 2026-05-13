@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.db import get_db
-from app import models
+from app.models import user_model
 
 SECRET_KEY = "secret"
 
@@ -73,11 +73,15 @@ def get_current_user(
             detail="Invalid token"
         )
 
-    user = db.query(models.User).filter(
-        models.User.id == user_id
+    user = db.query(user_model.User).filter(
+        user_model.User.id == user_id
     ).first()
 
-    if user is None:
+    print(payload)
+    print(type(user_id))
+    print(user_id)
+
+    if not user:
 
         raise HTTPException(
             status_code=401,
