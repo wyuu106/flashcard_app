@@ -8,7 +8,7 @@ from app.cruds import user_crud
 router = APIRouter()
 
 # ユーザー登録
-@router.post('/users', response_model=user_schema.UserResponse)
+@router.post('/register', response_model=user_schema.UserResponse)
 def create_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
     return user_crud.create_user(db, user)
 
