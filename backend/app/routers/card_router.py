@@ -53,3 +53,8 @@ def get_card(
     db: Session = Depends(get_db)):
     user_id = current_user.id
     return card_crud.get_card(db, id, user_id)
+
+# 全カード取得
+@router.get('/all_cards', response_model = list[card_schema.CardResponse])
+def get_all_cards(db: Session = Depends(get_db)):
+    return card_crud.get_all_cards(db)

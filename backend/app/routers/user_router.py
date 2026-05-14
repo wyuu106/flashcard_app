@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from app.db import get_db
+from app.models import user_model
 from app.schemas import user_schema
 from app.cruds import user_crud
+from app.auth import get_current_user
 
 router = APIRouter()
 
@@ -18,8 +20,12 @@ def get_users(db: Session = Depends(get_db)):
     return user_crud.get_users(db)
 
 # ユーザー削除
-@router.delete('/users/{id}')
-def delete_user(id: str, db: Session = Depends(get_db)):
+@router.delete('/users/me')
+def delete_user(
+    current_user: user_model.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ):
+    id = current_user.id
     return user_crud.delete_user(db, id)
 
 

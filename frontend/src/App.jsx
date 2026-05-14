@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 function App() {
   const [isRegister, setIsRegister] = useState(false)
   const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
   const [errorMessage, setErrorMessage] = useState("")
@@ -86,7 +87,7 @@ function App() {
         },
 
         body: JSON.stringify({
-          username: username,
+          name: username,
           password: password,
         }),
       }
@@ -114,6 +115,38 @@ function App() {
     localStorage.removeItem("token")
 
     setToken(null)
+  }
+
+  const deleteAccount = async () => {
+    const ok = window.confirm(
+      "本当にアカウントを削除しますか？"
+    )
+
+    if (!ok) {
+      return
+    }
+
+    const res = await fetch(
+      "http://localhost:8000/users/me",
+      {
+        method: "DELETE",
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    if (!res.ok) {
+      alert("アカウント削除失敗")
+      return
+    }
+
+    localStorage.removeItem("token")
+
+    setToken(null)
+
+    setCards([])
   }
 
   const addCard = () => {
@@ -266,6 +299,10 @@ function App() {
 
           <button onClick={logout}>
             ログアウト
+          </button>
+
+          <button onClick={deleteAccount}>
+            アカウント削除
           </button>
 
           <input

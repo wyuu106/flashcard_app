@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import Response, Depends, HTTPException, status
+from fastapi import Response, HTTPException, status
 from app.models import card_model
 from app.schemas import card_schema
 
@@ -64,3 +64,7 @@ def get_card(db: Session, id: int, user_id: str):
         raise HTTPException(status_code=404, detail='該当するカードが見つかりませんでした')
     
     return card
+
+# 全カード取得
+def get_all_cards(db: Session):
+    return db.query(card_model.Card).all()

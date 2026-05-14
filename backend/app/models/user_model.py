@@ -8,5 +8,4 @@ class User(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid4()))
     name: Mapped[str] = mapped_column(String, unique=True)
-    email: Mapped[str] = mapped_column(String)
     hashed_password: Mapped[str] = mapped_column(String)

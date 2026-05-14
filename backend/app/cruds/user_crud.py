@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from fastapi import Response, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from app.models import user_model
+from app.models import user_model, card_model
 from app.schemas import user_schema
 from app.auth import hash_password, verify_password, create_access_token
 
 # ユーザー登録
 def create_user(db: Session, user: user_schema.UserCreate):
-    exist_user = db.query(user_model.User).filter(user_model.name == user.name).first()
+    exist_user = db.query(user_model.User).filter(user_model.User.name == user.name).first()
     if exist_user:
         raise HTTPException(status_code=400, detail='このユーザー名は既に使われています')
     
@@ -16,7 +16,6 @@ def create_user(db: Session, user: user_schema.UserCreate):
 
     db_user = user_model.User(
         name = user.name,
-        email = user.email,
         hashed_password = hash_password(user.password)
     )
 
@@ -37,7 +36,11 @@ def delete_user(db: Session, id: str):
     if not db_user:
         raise HTTPException(status_code=404, detail="該当するユーザーが見つかりませんでした")
 
+    db_cards = db.query(card_model.Card).filter(card_model.Card.user_id == id).all()
+
     db.delete(db_user)
+    for db_card in db_cards:
+        db.delete(db_card)
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
