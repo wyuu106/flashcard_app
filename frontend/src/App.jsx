@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react"
 
 function App() {
+  const [isRegister, setIsRegister] = useState(false)
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+
+  const [errorMessage, setErrorMessage] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
+
+  const [token, setToken] = useState(
+    localStorage.getItem("token")
+  )
+
   const [cards, setCards] = useState([])
 
   const [word, setWord] = useState("")
@@ -17,15 +28,92 @@ function App() {
   const [mode, setMode] = useState("list")
 
   useEffect(() => {
-    fetchCards()
-  }, [])
+    if (token) {
+      fetchCards()
+    }
+  }, [token])
 
   const fetchCards = () => {
-    fetch("http://localhost:8000/cards")
-      .then((res) => res.json())
+    fetch("http://localhost:8000/cards", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) => res.json())
       .then((data) => {
         setCards(data)
       })
+  }
+
+  const login = async () => {
+    const formData = new FormData()
+
+    formData.append("username", username)
+    formData.append("password", password)
+
+    const res = await fetch(
+      "http://localhost:8000/login",
+      {
+        method: "POST",
+        body: formData,
+      }
+    )
+
+    if (!res.ok) {
+      setErrorMessage("ログイン失敗")
+      return
+    }
+
+    setErrorMessage("")
+
+    const data = await res.json()
+
+    localStorage.setItem(
+      "token",
+      data.access_token
+    )
+
+    setToken(data.access_token)
+  }
+
+  const register = async () => {
+    const res = await fetch(
+      "http://localhost:8000/register",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        }),
+      }
+    )
+
+    if (!res.ok) {
+      const data = await res.json()
+
+      setErrorMessage(data.detail)
+
+      return
+    }
+
+    setErrorMessage("")
+
+    setSuccessMessage("登録成功")
+
+    setUsername("")
+    setPassword("")
+
+    setIsRegister(false)
+  }
+
+  const logout = () => {
+    localStorage.removeItem("token")
+
+    setToken(null)
   }
 
   const addCard = () => {
@@ -33,6 +121,7 @@ function App() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         word: word,
@@ -49,6 +138,10 @@ function App() {
   const deleteCard = (id) => {
     fetch(`http://localhost:8000/cards/${id}`, {
       method: "DELETE",
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }).then(() => {
       fetchCards()
     })
@@ -65,6 +158,7 @@ function App() {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         word: word,
@@ -108,12 +202,71 @@ function App() {
   }
 
 
+  if (!token) {
+    return (
+      <div>
+        <h1>
+          {isRegister ? "新規登録" : "ログイン"}
+        </h1>
+
+        {errorMessage && (
+          <p>{errorMessage}</p>
+        )}
+
+        {successMessage && (
+          <p>{successMessage}</p>
+        )}
+
+        <input
+          type="text"
+          placeholder="username"
+          value={username}
+          onChange={(e) =>
+            setUsername(e.target.value)
+          }
+        />
+
+        <input
+          type="password"
+          placeholder="password"
+          value={password}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
+        />
+
+        {isRegister ? (
+          <button onClick={register}>
+            新規登録
+          </button>
+        ) : (
+          <button onClick={login}>
+            ログイン
+          </button>
+        )}
+
+        <button
+          onClick={() =>
+            setIsRegister(!isRegister)
+          }
+        >
+          {isRegister
+            ? "ログインへ"
+            : "新規登録へ"}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div>
       {mode === "list" ? (
         <div>
           <h1>Flashcard App</h1>
+
+          <button onClick={logout}>
+            ログアウト
+          </button>
 
           <input
             type="text"
