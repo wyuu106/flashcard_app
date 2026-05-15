@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 function App() {
   const [isRegister, setIsRegister] = useState(false)
   const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
   const [errorMessage, setErrorMessage] = useState("")
