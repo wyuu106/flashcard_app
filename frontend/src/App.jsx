@@ -21,9 +21,13 @@ function App() {
 
   const [openId, setOpenId] = useState(null)
 
-  const [quizCards, setQuizCards] = useState([])
+  const [quizQuestions, setQuizQuestions] = useState([])
+  const [quizSessionId, setQuizSessionId] = useState(null)
+
+  const [correctCount, setCorrectCount] = useState(0)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [showAnswer, setShowAnswer] = useState(false)
+  const [isAnswered, setIsAnswered] = useState(false)
+  const [isCorrect, setIsCorrect] = useState(null)
 
   const [mode, setMode] = useState("list")
 
@@ -40,7 +44,7 @@ function App() {
       },
     }).then((res) => res.json())
       .then((data) => {
-        setCards(data)
+        setCards(data) 
       })
   }
 
@@ -205,34 +209,111 @@ function App() {
     })
   }
 
-  const startQuiz = () => {
-    const shuffled = [...cards].sort(
-      () => Math.random() - 0.5
+  const startQuiz = async () => {
+    const res = await fetch(
+      "http://localhost:8000/start",
+      {
+        method: "POST",
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     )
 
-    setQuizCards(shuffled)
+    if (!res.ok) {
+      alert("問題開始失敗")
+      return
+    }
 
+    const data = await res.json()
+
+    setQuizSessionId(data.session_id)
+    setQuizQuestions(data.questions)
     setCurrentIndex(0)
-
-    setShowAnswer(false)
-
+    setIsAnswered(false)
+    setIsCorrect(null)  
+    setCorrectCount(0)
     setMode("quiz")
   }
 
-  const currentCard = quizCards[currentIndex]
+  const currentCard =
+    quizQuestions[currentIndex] || null
 
-  const nextQuestion = () => {
-    setCurrentIndex(currentIndex + 1)
-    setShowAnswer(false)
+  const answerQuiz = async (choice) => {
+    const res = await fetch(
+      "http://localhost:8000/answer",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify({
+          session_id: quizSessionId,
+          card_id: currentCard.card_id,
+          answer: choice,
+        }),
+      }
+    )
+
+    if (!res.ok) {
+      alert("解答失敗")
+      return
+    }
+
+    const data = await res.json()
+
+    setCorrectCount(data.correct_count)
+    setIsCorrect(data.is_correct)
+    setIsAnswered(true)
   }
 
-  const endQuiz = () => {
+  const nextQuestion = async () => {
+    setIsAnswered(false)
+
+    setIsCorrect(null)
+
+    if (currentIndex + 1 >= quizQuestions.length) {
+      await endQuiz()
+    } else {
+      setCurrentIndex((prev) => prev + 1)
+    }
+  }
+
+  const endQuiz = async () => {
+    const res = await fetch(
+      `http://localhost:8000/finish?session_id=${quizSessionId}`,
+      {
+        method: "POST",
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    if (!res.ok) {
+      alert("終了失敗")
+      return
+    }
+
+    const data = await res.json()
+
+    alert(
+      `${data.correct_count} / ${data.total_questions} 正解`
+    )
+
     setMode("list")
-    setQuizCards([])
+    setQuizQuestions([])
     setCurrentIndex(0)
-    setShowAnswer(false)
+    setQuizSessionId(null)
+    setCorrectCount(0)
+    setIsAnswered(false)
+    setIsCorrect(null)
   }
-
 
   if (!token) {
     return (
@@ -364,38 +445,51 @@ function App() {
         <div>
           <h1>Quiz Mode</h1>
 
-          {currentIndex >= quizCards.length ? (
-            <div>
-              <h2>全問題クリア！</h2>
+          <p>
+            {currentIndex + 1} / {quizQuestions.length}
+          </p>
 
-              <button onClick={() => setMode("list")}>
-                カード一覧に戻る
-              </button>
-            </div>
-          ) : (
+          <p>
+            正解数: {correctCount}
+          </p>
+
+          {currentCard && (
             <div className="card">
-              <h2>{currentCard.word}</h2>
+              <h2>{currentCard?.word}</h2>
 
-              {showAnswer && (
-                <p>{currentCard.meaning}</p>
+              {currentCard?.choices.map((choice) => (
+                <button
+                  key={choice}
+                  onClick={() => answerQuiz(choice)}
+                  disabled={isAnswered}
+                >
+                  {choice}
+                </button>
+              ))}
+
+              {isAnswered && currentCard && (
+                <div>
+                  <p>
+                    {isCorrect ? "正解！" : "不正解"}
+                  </p>
+
+                  <p>
+                    正解: {currentCard
+                      ? cards.find(
+                          (card) =>
+                            card.id === currentCard.card_id
+                        )?.meaning
+                      : ""}
+                  </p>
+
+                  <button onClick={nextQuestion}>
+                    次へ
+                  </button>
+                </div>
               )}
 
-              <button
-                onClick={() =>
-                  setShowAnswer(!showAnswer)
-                }
-              >
-                {showAnswer
-                  ? "隠す"
-                  : "裏を見る"}
-              </button>
-
-              <button onClick={nextQuestion}>
-                次の問題
-              </button>
-
               <button onClick={endQuiz}>
-                問題を修了する
+                問題を終了する
               </button>
             </div>
           )}
