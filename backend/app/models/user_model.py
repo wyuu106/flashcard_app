@@ -3,6 +3,7 @@ from sqlalchemy import String
 from uuid import uuid4
 from app.db import Base
 
+# ユーザー情報テーブル
 class User(Base):
     __tablename__ = 'users'
 

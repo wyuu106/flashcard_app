@@ -5,7 +5,7 @@ from app.models import card_model, quiz_model
 from app.schemas import quiz_schema
 from app.quiz_util import create_choices
 
-
+# クイズスタート
 def start_quiz(db: Session, user_id: str):
     cards = db.query(card_model.Card).filter(
         card_model.Card.user_id == user_id
@@ -23,11 +23,11 @@ def start_quiz(db: Session, user_id: str):
     db.commit()
     db.refresh(db_quizsession)
 
-    selected_cards = random.sample(cards, 10)
+    selected_cards = random.sample(cards, 10) # 出題するカードを選ぶ
 
     all_meaning = [card.meaning for card in cards]
 
-    questions = []
+    questions = [] # QuizQuestion型のリスト
 
     for question_card in selected_cards:
         questions.append(
@@ -43,7 +43,7 @@ def start_quiz(db: Session, user_id: str):
         'questions': questions
     }
 
-
+# 回答の正誤判定
 def answer_quiz(db: Session, request: quiz_schema.QuizAnswerRequest, user_id: str):
     quiz_session = db.query(quiz_model.QuizSession).filter(
         quiz_model.QuizSession.id == request.session_id,
@@ -75,6 +75,7 @@ def answer_quiz(db: Session, request: quiz_schema.QuizAnswerRequest, user_id: st
         'correct_count': quiz_session.correct_count
     }
 
+# クイズ終了
 def finish_quiz(db: Session, session_id: str, user_id: str):
     quiz_session = db.query(quiz_model.QuizSession).filter(
         quiz_model.QuizSession.id == session_id,

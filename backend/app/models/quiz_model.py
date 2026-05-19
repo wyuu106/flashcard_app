@@ -3,6 +3,7 @@ from sqlalchemy import Integer, String, ForeignKey
 from uuid import uuid4
 from app.db import Base
 
+# １連のクイズ（１０問）の情報
 class QuizSession(Base):
     __tablename__ = 'quiz_session'
 

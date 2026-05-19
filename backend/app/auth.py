@@ -22,9 +22,11 @@ oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="login"
 )
 
+# パスワードのハッシュ化
 def hash_password(password: str):
     return pwd_context.hash(password)
 
+# パスワード確認
 def verify_password(
     plain_password,
     hashed_password
@@ -51,6 +53,7 @@ def create_access_token(data: dict):
         algorithm=ALGORITHM
     )
 
+# ログイン中のユーザーを取得
 def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)

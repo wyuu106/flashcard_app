@@ -2,6 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, ForeignKey
 from app.db import Base
 
+# カード情報テーブル
 class Card(Base):
     __tablename__ = 'cards'
 
@@ -9,4 +10,4 @@ class Card(Base):
     word: Mapped[str] = mapped_column(String)
     meaning: Mapped[str] = mapped_column(String)
 
-    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id")) # ユーザーテーブルとの外部キー
