@@ -53,7 +53,7 @@ function App() {
   }
 
   const fetchUser = () => {
-    fetch("http://localhost:8000/users/me", {
+    fetch("https://flashcard-app-80v4.onrender.com/users/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -72,7 +72,7 @@ function App() {
     formData.append("password", password)
 
     const res = await fetch(
-      "http://localhost:8000/login",
+      "https://flashcard-app-80v4.onrender.com/login",
       {
         method: "POST",
         body: formData,
@@ -98,7 +98,7 @@ function App() {
 
   const register = async () => {
     const res = await fetch(
-      "http://localhost:8000/register",
+      "https://flashcard-app-80v4.onrender.com/register",
       {
         method: "POST",
 
@@ -147,7 +147,7 @@ function App() {
     }
 
     const res = await fetch(
-      "http://localhost:8000/users/me",
+      "https://flashcard-app-80v4.onrender.com/users/me",
       {
         method: "DELETE",
 
@@ -170,7 +170,7 @@ function App() {
   }
 
   const addCard = () => {
-    fetch("http://localhost:8000/cards", {
+    fetch("https://flashcard-app-80v4.onrender.com/cards", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -189,7 +189,7 @@ function App() {
   }
 
   const deleteCard = (id) => {
-    fetch(`http://localhost:8000/cards/${id}`, {
+    fetch(`https://flashcard-app-80v4.onrender.com/cards/${id}`, {
       method: "DELETE",
 
       headers: {
@@ -207,7 +207,7 @@ function App() {
   }
 
   const updateCard = () => {
-    fetch(`http://localhost:8000/cards/${editingId}`, {
+    fetch(`https://flashcard-app-80v4.onrender.com/cards/${editingId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -228,7 +228,7 @@ function App() {
 
   const startQuiz = async () => {
     const res = await fetch(
-      "http://localhost:8000/start",
+      "https://flashcard-app-80v4.onrender.com/start",
       {
         method: "POST",
 
@@ -259,7 +259,7 @@ function App() {
 
   const answerQuiz = async (choice) => {
     const res = await fetch(
-      "http://localhost:8000/answer",
+      "https://flashcard-app-80v4.onrender.com/answer",
       {
         method: "POST",
 
@@ -302,7 +302,7 @@ function App() {
 
   const endQuiz = async () => {
     const res = await fetch(
-      `http://localhost:8000/finish?session_id=${quizSessionId}`,
+      `https://flashcard-app-80v4.onrender.com/finish?session_id=${quizSessionId}`,
       {
         method: "POST",
 
