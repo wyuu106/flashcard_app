@@ -10,7 +10,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://flashcard-app-ecru-six.vercel.app/"
+        "https://flashcard-app-ecru-six.vercel.app" # 最後に / つけないように
     ],
     allow_credentials=True,
     allow_methods=["*"],
