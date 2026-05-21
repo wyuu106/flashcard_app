@@ -3,7 +3,7 @@ from fastapi import Response, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.models import user_model, card_model
 from app.schemas import user_schema
-from app.auth import hash_password, verify_password, create_access_token
+from app.utils.auth import hash_password, verify_password, create_access_token
 
 # ユーザー登録
 def create_user(db: Session, user: user_schema.UserCreate):

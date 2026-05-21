@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 import random
-from app.models import card_model, quiz_model
+from app.models import user_model, card_model, quiz_model
 from app.schemas import quiz_schema
-from app.quiz_util import create_choices
+from app.utils.quiz_util import create_choices
+from app.utils.level_util import level_up
 
 # クイズスタート
 def start_quiz(db: Session, user_id: str):
@@ -76,7 +77,9 @@ def answer_quiz(db: Session, request: quiz_schema.QuizAnswerRequest, user_id: st
     }
 
 # クイズ終了
-def finish_quiz(db: Session, session_id: str, user_id: str):
+def finish_quiz(db: Session, session_id: str, current_user: user_model.User):
+    user_id = current_user.id
+
     quiz_session = db.query(quiz_model.QuizSession).filter(
         quiz_model.QuizSession.id == session_id,
         quiz_model.QuizSession.user_id == user_id
@@ -86,6 +89,10 @@ def finish_quiz(db: Session, session_id: str, user_id: str):
         raise HTTPException(404)
     
     quiz_session.status = 'finished'
+
+    if current_user.level < 100:
+        get_exp = 3 ** (quiz_session.correct_count // 2)
+        current_user = level_up(current_user, get_exp)
 
     db.commit()
 

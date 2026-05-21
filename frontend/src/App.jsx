@@ -17,6 +17,9 @@ function App() {
   const [word, setWord] = useState("")
   const [meaning, setMeaning] = useState("")
 
+  const [level, setLevel] = useState(1)
+  const [exp, setExp] = useState(0)
+
   const [editingId, setEditingId] = useState(null)
 
   const [openId, setOpenId] = useState(null)
@@ -34,6 +37,7 @@ function App() {
   useEffect(() => {
     if (token) {
       fetchCards()
+      fetchUser()
     }
   }, [token])
 
@@ -45,6 +49,19 @@ function App() {
     }).then((res) => res.json())
       .then((data) => {
         setCards(data) 
+      })
+  }
+
+  const fetchUser = () => {
+    fetch("http://localhost:8000/users/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLevel(data.level)
+        setExp(data.exp)
       })
   }
 
@@ -302,6 +319,8 @@ function App() {
 
     const data = await res.json()
 
+    fetchUser()
+
     alert(
       `${data.correct_count} / ${data.total_questions} 正解`
     )
@@ -373,6 +392,19 @@ function App() {
 
   return (
     <div>
+      <div
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          border: "1px solid black",
+          padding: "10px",
+        }}
+      >
+        <p>Lv. {level}</p>
+        <p>Exp: {exp}</p>
+      </div>
+
       {mode === "list" ? (
         <div>
           <h1>Flashcard App</h1>

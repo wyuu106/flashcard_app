@@ -79,11 +79,7 @@ def get_current_user(
     user = db.query(user_model.User).filter(
         user_model.User.id == user_id
     ).first()
-
-    print(payload)
-    print(type(user_id))
-    print(user_id)
-
+    
     if not user:
 
         raise HTTPException(

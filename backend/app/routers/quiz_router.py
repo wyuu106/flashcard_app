@@ -4,7 +4,7 @@ from app.db import get_db
 from app.models import user_model
 from app.schemas import quiz_schema
 from app.cruds import quiz_crud
-from app.auth import get_current_user
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -34,5 +34,4 @@ def finish_quiz(
     current_user: user_model.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    user_id = current_user.id
-    return quiz_crud.finish_quiz(db, session_id, user_id)
+    return quiz_crud.finish_quiz(db, session_id, current_user)

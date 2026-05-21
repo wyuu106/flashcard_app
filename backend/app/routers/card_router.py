@@ -4,7 +4,7 @@ from app.db import get_db
 from app.models import user_model
 from app.schemas import card_schema
 from app.cruds import card_crud
-from app.auth import get_current_user
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 

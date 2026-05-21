@@ -5,7 +5,7 @@ from app.db import get_db
 from app.models import user_model
 from app.schemas import user_schema
 from app.cruds import user_crud
-from app.auth import get_current_user
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -33,3 +33,11 @@ def delete_user(
 @router.post('/login')
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     return user_crud.login(db, form_data)
+
+# ユーザーのlevelとexp取得
+@router.get('/users/me')
+def get_me(current_user: user_model.User = Depends(get_current_user)):
+    return {
+        "level": current_user.level,
+        "exp": current_user.exp
+    }
