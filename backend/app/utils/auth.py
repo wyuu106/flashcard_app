@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta
 from jose import jwt
 from jose import JWTError
@@ -9,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models import user_model
 
-SECRET_KEY = "secret"
+SECRET_KEY = os.getenv("secret")
 
 ALGORITHM = "HS256"
 
