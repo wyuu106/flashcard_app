@@ -42,7 +42,7 @@ function App() {
   }, [token])
 
   const fetchCards = () => {
-    fetch("http://localhost:8000/cards", {
+    fetch("https://flashcard-app-80v4.onrender.com/cards", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
